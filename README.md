@@ -16,10 +16,10 @@ MailXposed is a full-stack web app that checks if your email address has been ex
 ## 📸 Screenshots
 
 ### 💡 Light Mode
-![Screenshot](assets/screenshot1.png)
+
 
 ### 🌗 Dark Mode
-![Screenshot](assets/screenshot2.png)
+
 
 ## 📁 Project Structure
 
