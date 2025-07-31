@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data Breach Checker</title>
+
+  <!-- Font Awesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Animate.css (for smooth animations) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <style>
+    :root {
+      --light-bg: linear-gradient(to right, #dbeafe, #f0fdf4);
+      --dark-bg: linear-gradient(to right, #0f172a, #1e293b);
+      --light-text: #000;
+      --dark-text: #f1f5f9;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light-bg);
+      color: var(--light-text);
+      text-align: center;
+      padding: 40px 20px;
+      transition: all 0.3s ease;
+    }
+
+    body.dark {
+      background: var(--dark-bg);
+      color: var(--dark-text);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 65%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background: linear-gradient(to right, #3b82f6, #10b981);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      width: 100%;
+      max-width: 500px;
+      transition: all 0.3s ease;
+    }
+
+    .breached {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 2px solid #f87171;
+    }
+
+    .safe {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #4ade80;
+    }
+
+    .error {
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #facc15;
+    }
+
+    body.dark .breached {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    body.dark .safe {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+
+    body.dark .error {
+      background: #78350f;
+      color: #fde68a;
+    }
+
+    .toggle {
+      margin-top: 15px;
+    }
+
+    .footer {
+      margin-top: 80px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    body.dark .footer {
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body class="animate__animated animate__fadeIn">
+  <div class="container">
+    <h1 class="animate__animated animate__fadeInDown">🔐 Check if Your Email Was Breached</h1>
+
+    <input type="email" id="emailInput" placeholder="Enter your email" />
+    <button onclick="checkBreach()"><i class="fas fa-shield-alt"></i> Check</button>
+
+    <div id="result" class="animate__animated"></div>
+    <div id="riskMeterContainer" style="margin-top: 20px;"></div>
+    <div id="tipsContainer" style="margin-top: 20px;"></div>
+
+    <div class="toggle">
+      <label>
+        <input type="checkbox" id="darkModeToggle" />
+        🌙 Enable Dark Mode
+      </label>
+    </div>
+
+    <div class="footer">
+      Made with ❤️ by a privacy enthusiast | Stay Safe Online!
+    </div>
+  </div>
+
+<script>
+  function checkBreach() {
+    const email = document.getElementById('emailInput').value;
+    const resultDiv = document.getElementById('result');
+    const riskMeterContainer = document.getElementById('riskMeterContainer');
+    const tipsContainer = document.getElementById('tipsContainer');
+
+    resultDiv.innerHTML = '';
+    resultDiv.className = '';
+    riskMeterContainer.innerHTML = '';
+    tipsContainer.innerHTML = '';
+
+    if (!email.includes('@') || !email.includes('.')) {
+      resultDiv.className = 'error';
+      resultDiv.innerHTML = '❌ Please enter a valid email address.';
+      return;
+    }
+
+    const domain = email.split('@')[1];
+
+    fetch(`http://localhost:3000/api/check-domain?domain=${domain}`)
+      .then(response => response.json())
+      .then(data => {
+        const breached = data.breachedAccounts.filter(account => account.email === email);
+
+        if (breached.length > 0) {
+          resultDiv.className = 'breached';
+          resultDiv.innerHTML = `
+            <p>❌ Oh no! Your email was found in ${breached.length} breach(es).</p>
+            <ul>
+              ${breached.map(b => `<li><strong>${b.source}</strong></li>`).join('')}
+            </ul>
+          `;
+
+          // 🔥 Risk Meter Logic
+          let riskLevel = '';
+          let tips = '';
+
+          if (breached.length >= 5) {
+            riskLevel = 'High';
+            tips = `
+              <ul>
+                <li>🔐 Change all breached passwords immediately.</li>
+                <li>🛡️ Enable 2FA on all critical accounts.</li>
+                <li>🧠 Use a trusted password manager.</li>
+              </ul>`;
+          } else if (breached.length >= 2) {
+            riskLevel = 'Medium';
+            tips = `
+              <ul>
+                <li>⚠️ Review the accounts and update passwords.</li>
+                <li>🔒 Don’t reuse passwords across websites.</li>
+              </ul>`;
+          } else {
+            riskLevel = 'Low';
+            tips = `
+              <ul>
+                <li>😊 No breach found, but stay alert.</li>
+                <li>🛡️ Use strong and unique passwords.</li>
+              </ul>`;
+          }
+
+          riskMeterContainer.innerHTML = `
+            <h3>🧪 Risk Level: ${riskLevel}</h3>
+            <div style="width: 100%; background: #e5e7eb; border-radius: 8px;">
+              <div style="width: ${riskLevel === 'High' ? '100%' : riskLevel === 'Medium' ? '60%' : '30%'};
+                          height: 15px; border-radius: 8px;
+                          background: ${riskLevel === 'High' ? '#dc2626' : riskLevel === 'Medium' ? '#f59e0b' : '#10b981'};">
+              </div>
+            </div>
+          `;
+
+          tipsContainer.innerHTML = `
+            <h3>💡 Safety Tips</h3>
+            <div style="background: #f9fafb; padding: 10px 20px; border-radius: 8px; text-align: left;">
+              ${tips}
+            </div>
+          `;
+
+        } else {
+          resultDiv.className = 'safe';
+          resultDiv.innerHTML = '✅ No breach found! You’re safe.';
+        }
+      })
+      .catch(error => {
+        console.error('Error checking breach:', error);
+        resultDiv.className = 'error';
+        resultDiv.innerHTML = '⚠️ Error checking breach. Please try again later.';
+      });
+  }
+</script>
+<script>
+  // 🌙 Dark mode toggle functionality
+  const toggle = document.getElementById('darkModeToggle');
+  const body = document.body;
+
+  // Load saved mode
+  if (localStorage.getItem('dark-mode') === 'enabled') {
+    body.classList.add('dark');
+    toggle.checked = true;
+  }
+
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      body.classList.add('dark');
+      localStorage.setItem('dark-mode', 'enabled');
+    } else {
+      body.classList.remove('dark');
+      localStorage.setItem('dark-mode', 'disabled');
+    }
+  });
+</script>
+
+</body>
+</html>
