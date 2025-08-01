@@ -21,5 +21,22 @@ router.get('/check', (req, res) => {
     });
   });
 });
+// Check all emails under a domain
+router.get('/check-domain', (req, res) => {
+  const { domain } = req.query;
+
+  if (!domain) {
+    return res.status(400).json({ error: 'Domain is required' });
+  }
+
+  const query = 'SELECT email, source FROM breaches WHERE email LIKE ?';
+  db.query(query, [`%@${domain}`], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+
+    res.json({
+      breachedAccounts: results
+    });
+  });
+});
 
 module.exports = router;

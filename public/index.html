@@ -163,7 +163,7 @@
 
     const domain = email.split('@')[1];
 
-    fetch(`http://localhost:3000/api/check-domain?domain=${domain}`)
+    fetch(`/api/check-domain?domain=${domain}`)
       .then(response => response.json())
       .then(data => {
         const breached = data.breachedAccounts.filter(account => account.email === email);
