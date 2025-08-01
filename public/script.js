@@ -13,7 +13,7 @@ async function checkBreach() {
   }
 
   try {
-    const res = await fetch(`http://localhost:3000/api/check-domain?domain=${domain}`);
+    const res = await fetch(`https://mailxposed.onrender.com/api/check-domain?domain=${domain}`);
     const data = await res.json();
 
     const matchedEmails = data.breachedAccounts.filter(entry => entry.email === emailInput);
