@@ -3,7 +3,7 @@
 MailXposed is a full-stack web app that checks if your email address has been exposed in known data breaches.
 
 ## 🌐 Live Demo
-🔗 [Live Website](https://mailxposed.onrender.com) (Link will be updated after deployment)
+🔗 [Live Website](https://mailxposed.onrender.com)
 
 ## 🚀 Features
 
