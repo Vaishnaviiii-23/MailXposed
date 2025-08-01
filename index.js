@@ -16,7 +16,28 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on https://mailxposed.onrender.com`);
+   const domain = req.query.domain;
+  console.log("Incoming domain query:", domain);
+
+  if (!domain) {
+    return res.status(400).json({ message: 'Domain is required' });
+  }
+
+  const query = 'SELECT * FROM breaches WHERE email LIKE ?';
+  pool.query(query, [`%@${domain}`], (err, results) => {
+    if (err) {
+      console.error('Error fetching domain breaches:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    console.log("Breach results:", results);
+
+    res.json({
+      domain: domain,
+      totalBreachedEmails: results.length,
+      breachedAccounts: results
+    });
+  });
 });
 
 // ✅ POST /api/breaches - Add a new breach
