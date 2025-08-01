@@ -6,28 +6,29 @@ require('dotenv').config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Serve index.html
+// Serve index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ✅ Domain-based email breach check
+// GET /api/check-domain?domain=gmail.com
 app.get('/api/check-domain', (req, res) => {
   const domain = req.query.domain;
-  console.log("Incoming domain query:", domain);
+  console.log("🔍 Domain to check:", domain);
 
   if (!domain) {
     return res.status(400).json({ message: 'Domain is required' });
   }
 
-  const query = 'SELECT * FROM breaches WHERE email LIKE ?';
+  const query = 'SELECT email, source FROM breaches WHERE email LIKE ?';
   pool.query(query, [`%@${domain}`], (err, results) => {
     if (err) {
-      console.error('Error fetching domain breaches:', err);
+      console.error('❌ DB Error:', err);
       return res.status(500).json({ message: 'Database error' });
     }
 
@@ -39,7 +40,7 @@ app.get('/api/check-domain', (req, res) => {
   });
 });
 
-// ✅ POST to add breach
+// POST /api/breaches
 app.post('/api/breaches', (req, res) => {
   const { email, password, source } = req.body;
 
@@ -50,15 +51,16 @@ app.post('/api/breaches', (req, res) => {
   const query = 'INSERT INTO breaches (email, password, source) VALUES (?, ?, ?)';
   pool.query(query, [email, password, source], (err, result) => {
     if (err) {
-      console.error('Error inserting breach:', err);
-      return res.status(500).json({ message: 'Database insert error' });
+      console.error('❌ Insert error:', err);
+      return res.status(500).json({ message: 'Insert error' });
     }
 
-    res.status(201).json({ message: 'Breach added successfully', breachId: result.insertId });
+    res.status(201).json({ message: '✅ Breach added successfully', breachId: result.insertId });
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
