@@ -3,34 +3,39 @@
 MailXposed is a full-stack web app that checks if your email address has been exposed in known data breaches.
 
 ## 🌐 Live Demo
-(Will be added after deployment)
+🔗 [Live Website](https://mailxposed.onrender.com) (Link will be updated after deployment)
 
 ## 🚀 Features
 
-- 📧 Check email for data breach history
-- 🌗 Toggle between Light and Dark Mode
-- 📊 Risk Meter with safety tips
-- ✅ Real-time feedback with clear results
-- 🔒 Built with Node.js + Express + HTML/CSS/JS
+- 📧 Check email for data breach history  
+- 🌗 Toggle between Light and Dark Mode  
+- 📊 Risk Meter with personalized safety tips  
+- ✅ Real-time feedback with clear results  
+- 🔒 Built with Node.js + Express + HTML/CSS/JS  
 
 ## 📸 Screenshots
 
-### 💡 Light Mode
-![Screenshot](assets/light mode.png)
+### 💡 Light Mode  
+![Light Mode](assets/light-mode.png)
 
-### 🌗 Dark Mode
-![Screenshot](assets/dark mode.png)
+### 🌗 Dark Mode  
+![Dark Mode](assets/dark-mode.png)
 
 ## 📁 Project Structure
 
-MailXposed/
+```MailXposed/
 ├── public/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
 ├── routes/
+│   └── breachRoutes.js
 ├── index.js
 ├── db.js
 ├── .env
-└── README.me
-
+├── .gitignore
+└── README.md
+```
 ## 🛠️ Tech Stack
 
 - Frontend: HTML, CSS, JavaScript
@@ -53,9 +58,7 @@ cd MailXposed
 npm install
 node index.js
 Then open public/index.html in your browser.
-
-🧑‍💻 Author
+```
+## 🧑‍💻 Author
 Vaishnavi P Poojari
-
-
 
