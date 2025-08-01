@@ -1,5 +1,4 @@
 function getDomainFromEmail(email) {
-  if (!email.includes('@')) return null;
   return email.split('@')[1];
 }
 
@@ -14,18 +13,10 @@ async function checkBreach() {
   }
 
   try {
-    const res = await fetch(`https://mailxposed.onrender.com/api/check-domain?domain=${domain}`);
-
-    if (!res.ok) {
-      throw new Error(`Server error: ${res.status}`);
-    }
-
+    const res = await fetch(`http://localhost:3000/api/check-domain?domain=${domain}`);
     const data = await res.json();
 
-    // Check if data.breachedAccounts is valid array
-    const breachedList = Array.isArray(data.breachedAccounts) ? data.breachedAccounts : [];
-
-    const matchedEmails = breachedList.filter(entry => entry.email === emailInput);
+    const matchedEmails = data.breachedAccounts.filter(entry => entry.email === emailInput);
 
     if (matchedEmails.length > 0) {
       resultDiv.innerHTML = `❌ Oh no! Your email <strong>${emailInput}</strong> was found in a data breach (Source: ${matchedEmails[0].source}).`;
@@ -34,6 +25,6 @@ async function checkBreach() {
     }
   } catch (error) {
     resultDiv.innerHTML = "⚠️ Error checking breach. Please try again later.";
-    console.error("Fetch error:", error);
+    console.error(error);
   }
 }
