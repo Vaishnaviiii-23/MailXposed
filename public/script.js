@@ -4,39 +4,34 @@ function getDomainFromEmail(email) {
 }
 
 async function checkBreach() {
-  const emailInput = document.getElementById("emailInput").value.trim();
+  const emailInput = document.getElementById("emailInput").value;
   const domain = getDomainFromEmail(emailInput);
   const resultDiv = document.getElementById("result");
 
-  resultDiv.innerHTML = ""; // Clear previous result
-
   if (!emailInput || !domain) {
-    resultDiv.innerHTML = "⚠️ Please enter a valid email address.";
+    resultDiv.innerHTML = "⚠️ Please enter a valid email.";
     return;
   }
 
   try {
-    const response = await fetch(`https://mailxposed.onrender.com/api/check-domain?domain=${domain}`);
-    
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
+    const res = await fetch(`https://mailxposed.onrender.com/api/check-domain?domain=${domain}`);
+
+    if (!res.ok) {
+      throw new Error(`Server error: ${res.status}`);
     }
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (!data || !Array.isArray(data.breachedAccounts)) {
-      resultDiv.innerHTML = "⚠️ Unexpected response from server.";
-      return;
-    }
+    // Check if data.breachedAccounts is valid array
+    const breachedList = Array.isArray(data.breachedAccounts) ? data.breachedAccounts : [];
 
-    const match = data.breachedAccounts.find(entry => entry.email === emailInput);
+    const matchedEmails = breachedList.filter(entry => entry.email === emailInput);
 
-    if (match) {
-      resultDiv.innerHTML = `❌ Oh no! Your email <strong>${emailInput}</strong> was found in a data breach (Source: <strong>${match.source}</strong>).`;
+    if (matchedEmails.length > 0) {
+      resultDiv.innerHTML = `❌ Oh no! Your email <strong>${emailInput}</strong> was found in a data breach (Source: ${matchedEmails[0].source}).`;
     } else {
       resultDiv.innerHTML = `✅ Good news! Your email <strong>${emailInput}</strong> was NOT found in any known breach.`;
     }
-
   } catch (error) {
     resultDiv.innerHTML = "⚠️ Error checking breach. Please try again later.";
     console.error("Fetch error:", error);

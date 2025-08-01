@@ -17,28 +17,34 @@ app.get('/', (req, res) => {
 });
 
 // GET /api/check-domain?domain=gmail.com
+// ✅ Domain-based email breach check
 app.get('/api/check-domain', (req, res) => {
   const domain = req.query.domain;
-  console.log("🔍 Domain to check:", domain);
+  console.log("📩 Incoming domain query:", domain);
 
   if (!domain) {
-    return res.status(400).json({ message: 'Domain is required' });
+    return res.status(400).json({ message: '❌ Domain is required' });
   }
 
-  const query = 'SELECT email, source FROM breaches WHERE email LIKE ?';
+  const query = 'SELECT * FROM breaches WHERE email LIKE ?';
   pool.query(query, [`%@${domain}`], (err, results) => {
     if (err) {
-      console.error('❌ DB Error:', err);
+      console.error('❌ Database error:', err);
       return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (!results) {
+      return res.status(500).json({ message: 'No results returned' });
     }
 
     res.json({
       domain: domain,
       totalBreachedEmails: results.length,
-      breachedAccounts: results
+      breachedAccounts: results || [] // default to empty array
     });
   });
 });
+
 
 // POST /api/breaches
 app.post('/api/breaches', (req, res) => {
