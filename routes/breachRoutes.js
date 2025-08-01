@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../server/db');
+const db = require('../db');
 
 // Get all breached data
 router.get('/breaches', (req, res) => {
